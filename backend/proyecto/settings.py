@@ -99,7 +99,7 @@ DATABASES = {
 
 
 
-AUTH_USER_MODEL = "auth.user"
+AUTH_USER_MODEL = "portal.PerfilUser"
 
 
 # Password validation
