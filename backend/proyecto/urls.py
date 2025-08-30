@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('portal/', include("portal.urls"), name="portal"),
+    path('', include("portal.urls")),
 
 
 ]

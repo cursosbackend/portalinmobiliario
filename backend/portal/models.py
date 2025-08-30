@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import uuid
@@ -28,7 +27,7 @@ class Inmueble(models.Model):
         casa = "CASA", _("Casa")
         depto = "DEPARTAMENTO", _("Departamento")
         parcela = "PARCELA", _("Parcela")
-    propietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="inmuebles" )
+    propietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="inmuebles", null=True, blank=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     m2_construidos = models.FloatField(default=0)
@@ -45,7 +44,7 @@ class Inmueble(models.Model):
 
 
     def __str__(self):
-        return f"propietario: {self.propietario} |  {self.nombre}"
+        return f" {self.id} {self.propietario} {self.nombre}"
 
 
 
@@ -57,7 +56,7 @@ class SolicitudArriendo(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     inmueble = models.ForeignKey(Inmueble, on_delete=models.CASCADE, related_name="solicitudes")
-    arrendatario = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, related_name="solicitudes_enviadas")
+    arrendatario = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, related_name="solicitudes_enviadas", null=True, blank=True)
     mensaje = models.TextField()
     estado = models.CharField(max_length=10 , choices=EstadoSolicitud.choices,  default=EstadoSolicitud.PENDIENTE)
     creado = models.DateTimeField(auto_now_add=True)
@@ -69,6 +68,7 @@ class SolicitudArriendo(models.Model):
 
 
 class PerfilUser(AbstractUser):
+    
     class TipoUsuario(models.TextChoices):
         ARRENDATARIO = "ARRENDATARIO", _("Arrendatario")
         ARRENDADOR = "ARRENDADOR", _("Arrendador")
