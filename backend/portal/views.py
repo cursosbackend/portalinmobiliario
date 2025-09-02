@@ -1,6 +1,11 @@
-from django.shortcuts import render
-
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from .form import RegisterForm, LoginForm
+from django.contrib.auth import login, logout
+from django.views.decorators.csrf import csrf_protect
 
 from .models import (
     Region,
@@ -28,6 +33,46 @@ from django.views.generic import (
 )
 
 # Create your views here.
+
+def home(request):
+    return render(request, "web/home.html" )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # CRUD PARA Region
 
@@ -159,3 +204,38 @@ class PerfilUserUpdateView(UpdateView):
     form_class = PerfilUserForm
     template_name = "usuarios/perfil_form.html"
     success_url = reverse_lazy("solicitud_list")
+
+
+
+#login/logout/register
+###########################################################
+
+
+def register_view(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Cuenta creada correctamente.")
+            return redirect("home")
+    else:
+        form = RegisterForm()
+    return render(request, "registration/register.html", {"form": form})
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+    form = LoginForm(request, data=request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.get_user()
+        login(request, user)
+        messages.success(request, "Has iniciado sesión.")
+        return redirect("home")
+    return render(request, "registration/login.html", {"form": form})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.info(request, "Has cerrado sesión.")
+    return redirect("login")

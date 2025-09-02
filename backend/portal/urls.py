@@ -1,10 +1,16 @@
 from django.urls import path 
+from .views import register_view, login_view, logout_view
 from .views import *
 
 
 
 
 urlpatterns = [
+
+  path("", home , name="home"),
+   
+
+  
   path("listar_regiones/", regionListView.as_view(), name="region_list"),
   path("crear_region/", RegionCreateView.as_view(), name="region_create"),
   path("actualizar_region/<int:pk>/", RegionUpdateView.as_view(), name="actualizar_region"),
@@ -26,4 +32,10 @@ urlpatterns = [
   path("borrar_solicitud/<int:pk>",SolicitudArriendoDeleteView.as_view(), name="solicitud_delete"),
   ###########################################################################################
   path("actualizar_perfil/<int:pk>",PerfilUserUpdateView.as_view(), name="perfil_update"),
+
+
+  
+  path("accounts/login/",  login_view,  name="login"),
+  path("accounts/logout/", logout_view, name="logout"),
+  path("accounts/register/", register_view, name="register"),
 ]
