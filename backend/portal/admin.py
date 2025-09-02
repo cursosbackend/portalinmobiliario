@@ -24,7 +24,7 @@ class SolicitudArriendoAdmin(admin.ModelAdmin):
 @admin.register(PerfilUser)
 class PerfilUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
-        ("Información extra", {"fields": ("rut", "tipo_usuario")}),
+        ("Información extra", {"fields": ("rut", "tipo_usuario","imagen")}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
         (None, {"fields": ("rut", "tipo_usuario")}),

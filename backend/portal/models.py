@@ -75,6 +75,7 @@ class PerfilUser(AbstractUser):
         ARRENDADOR = "ARRENDADOR", _("Arrendador")
     tipo_usuario = models.CharField(max_length=13, choices=TipoUsuario.choices, default=TipoUsuario.ARRENDATARIO)  
     rut = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    imagen = models.ImageField(upload_to='fotos_perfil/', default="default-profile.avif" )
                       
     def __str__(self):
         return f"{self.get_full_name()} | {self.tipo_usuario}"

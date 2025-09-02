@@ -24,6 +24,7 @@ class InmuebleForm(forms.ModelForm):
         fields = [
             "nombre",
             "descripcion",
+            "imagen",
             "m2_construidos",
             "m2_totales",
             "estacionamientos",
@@ -66,6 +67,7 @@ class RegisterForm(UserCreationForm):
             "last_name",
             "email",
             "rut",
+            "imagen",
             "tipo_usuario",
             "password1",
             "password2",
