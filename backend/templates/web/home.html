@@ -70,6 +70,11 @@
             <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
         </div>
         </div>
+        {% if user.is_authenticated %}
+            <p>Hola, {{ user.get_full_name|default:user.username }}</p>
+        {% else %}
+            <p>Hola, visitante. <a href="{% url 'login' %}">Inicia sesión</a></p>
+        {% endif %}
     </nav>
 
     <!-- Hero -->
@@ -102,7 +107,7 @@
                 <li><strong>Estacionamiento:</strong> 1</li>
               </ul>
               <p class="card-price">$450.000 / mes</p>
-              <a href="#" class="btn btn-outline-primary w-100">Solicitar Arrendamiento</a>
+              <a href="{% url 'solicitud_create_for_inmueble' i.id %}" class="btn btn-outline-primary w-100">Solicitar Arrendamiento</a>
             </div>
           </div>
         </div>

@@ -1,16 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form method="post">
+{# templates/inmuebles/solicitud_form.html #}
+
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Ficha del inmueble -->
+  <div class="card mb-4 shadow-sm">
+    <div class="row g-0">
+      <div class="col-md-5">
+        {# Si algún día agregas campo imagen al modelo, cámbialo a inmueble.imagen.url #}
+        <img
+          src="{% if inmueble.imagen %}{{ inmueble.imagen.url }}{% else %}https://picsum.photos/600/400?random={{ inmueble.id }}{% endif %}"
+          class="img-fluid rounded-start w-100 h-100 object-fit-cover"
+          alt="Imagen de {{ inmueble.nombre }}">
+      </div>
+      <div class="col-md-7">
+        <div class="card-body">
+          <h4 class="card-title mb-1">{{ inmueble.nombre }}</h4>
+          <p class="text-muted mb-2">
+            {{ inmueble.comuna.nombre }} · {{ inmueble.get_tipo_de_inmueble_display }}
+          </p>
+          <p class="mb-3">{{ inmueble.descripcion|default:"(sin descripción)" }}</p>
+          <ul class="list-inline small mb-3">
+            <li class="list-inline-item me-3"><strong>Construidos:</strong> {{ inmueble.m2_construidos }} m²</li>
+            <li class="list-inline-item me-3"><strong>Totales:</strong> {{ inmueble.m2_totales }} m²</li>
+            <li class="list-inline-item me-3"><strong>Habitaciones:</strong> {{ inmueble.habitaciones }}</li>
+            <li class="list-inline-item me-3"><strong>Baños:</strong> {{ inmueble.banos }}</li>
+            <li class="list-inline-item me-3"><strong>Estac.:</strong> {{ inmueble.estacionamientos }}</li>
+          </ul>
+          <h5 class="text-success mb-0">
+            ${{ inmueble.precio_mensual }} / mes
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de solicitud -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">Enviar solicitud de arriendo</h5>
+      <form method="post">
         {% csrf_token %}
-        {{form.as_p}}
-        <button type="submit">enviar solicitud</button>
-    </form>
-    
-</body>
-</html>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">Volver</a>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

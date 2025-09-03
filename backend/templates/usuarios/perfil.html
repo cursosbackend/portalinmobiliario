@@ -1,0 +1,93 @@
+{# templates/usuarios/perfil.html #}
+{% load i18n %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="mb-0">{{ user.get_full_name|default:user.username }}</h2>
+      <small class="text-muted">
+        {{ user.get_username }} · {{ user.tipo_usuario }}
+      </small>
+    </div>
+    <div>
+      <a href="{% url 'logout' %}" class="btn btn-outline-danger">Cerrar sesión</a>
+    </div>
+  </div>
+
+  {# Mostrar SOLO lo que corresponde al rol #}
+  {% if user.tipo_usuario == "ARRENDATARIO" %}
+    <h4 class="mt-4">Mis solicitudes enviadas</h4>
+    {% if enviadas %}
+      <div class="row g-3">
+        {% for s in enviadas %}
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-1">{{ s.inmueble.nombre }}</h5>
+                <small class="text-muted">
+                  {{ s.inmueble.comuna.nombre }} · {{ s.inmueble.get_tipo_de_inmueble_display }}
+                </small>
+                <p class="mt-2 mb-2">{{ s.mensaje|default:"(sin mensaje)" }}</p>
+                <span class="badge bg-{% if s.estado == "A" %}success{% elif s.estado == "R" %}danger{% else %}secondary{% endif %}">
+                  {{ s.get_estado_display }}
+                </span>
+              </div>
+              <div class="card-footer bg-white">
+                <small class="text-muted">Enviada: {{ s.creado|date:"d/m/Y H:i" }}</small>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info mt-3">Aún no envías solicitudes.</div>
+    {% endif %}
+  {% endif %}
+
+  {% if user.tipo_usuario == "ARRENDADOR" %}
+    <h4 class="mt-4">Solicitudes recibidas (mis inmuebles)</h4>
+    {% if recibidas %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Inmueble</th>
+              <th>Arrendatario</th>
+              <th>Mensaje</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in recibidas %}
+              <tr>
+                <td>
+                  <strong>{{ s.inmueble.nombre }}</strong><br>
+                  <small class="text-muted">
+                    {{ s.inmueble.comuna.nombre }} · {{ s.inmueble.get_tipo_de_inmueble_display }}
+                  </small>
+                </td>
+                <td>
+                  {{ s.arrendatario.get_full_name|default:s.arrendatario.username }}
+                </td>
+                <td>{{ s.mensaje|default:"(sin mensaje)" }}</td>
+                <td>
+                  <span class="badge bg-{% if s.estado == "A" %}success{% elif s.estado == "R" %}danger{% else %}secondary{% endif %}">
+                    {{ s.get_estado_display }}
+                  </span>
+                </td>
+                <td><small>{{ s.creado|date:"d/m/Y H:i" }}</small></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-info mt-3">Aún no recibes solicitudes.</div>
+    {% endif %}
+  {% endif %}
+
+  {# Si quieres mostrar ambas secciones para ambos roles, quita las condiciones y deja las dos #}
+</div>
+{% endblock %}

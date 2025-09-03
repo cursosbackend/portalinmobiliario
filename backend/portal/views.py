@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
@@ -6,6 +6,9 @@ from django.urls import reverse
 from .form import RegisterForm, LoginForm
 from django.contrib.auth import login, logout
 from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
+from django.db.models import Prefetch
 
 from .models import (
     Region,
@@ -34,47 +37,7 @@ from django.views.generic import (
 
 # Create your views here.
 
-def home(request):
-    return render(request, "web/home.html" )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# CRUD PARA Region
 
 
 class regionListView(ListView):
@@ -176,10 +139,28 @@ class SolicitudArriendoListView(ListView):
 
 
 class SolicitudArriendoCreateView(CreateView):
-    model = Inmueble
+    model = SolicitudArriendo
     form_class = SolicitudArriendoForm
     template_name = "inmuebles/solicitud_form.html"
-    success_url = reverse_lazy("solicitud_list")
+    success_url = reverse_lazy("perfil")  # o donde quieras
+
+    def dispatch(self, request, *args, **kwargs):
+        # Cargamos el inmueble una vez para reutilizarlo
+        self.inmueble = get_object_or_404(Inmueble, pk=kwargs["inmueble_pk"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["inmueble"] = self.inmueble
+        return ctx
+
+    def form_valid(self, form):
+        solicitud = form.save(commit=False)
+        solicitud.inmueble = self.inmueble
+        solicitud.arrendatario = self.request.user
+        solicitud.save()
+        messages.success(self.request, "¡Solicitud enviada con éxito!")
+        return redirect(self.success_url)
 
 
 class SolicitudArriendoUpdateView(UpdateView):
@@ -204,6 +185,36 @@ class PerfilUserUpdateView(UpdateView):
     form_class = PerfilUserForm
     template_name = "usuarios/perfil_form.html"
     success_url = reverse_lazy("solicitud_list")
+
+
+@method_decorator(login_required, name="dispatch")
+class PerfilView(TemplateView):
+    template_name = "usuarios/perfil.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        u = self.request.user
+
+        # Solicitadas por mí (si soy arrendatario)
+        enviadas = (
+            u.solicitudes_enviadas
+            .select_related("inmueble", "inmueble__comuna")
+            .order_by("-creado")
+        )
+
+        # Recibidas en mis inmuebles (si soy arrendador)
+        recibidas = (
+            SolicitudArriendo.objects
+            .filter(inmueble__propietario=u)
+            .select_related("inmueble", "inmueble__comuna", "arrendatario")
+            .order_by("-creado")
+        )
+
+        ctx.update({
+            "enviadas": enviadas,
+            "recibidas": recibidas,
+        })
+        return ctx
 
 
 

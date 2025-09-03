@@ -40,13 +40,7 @@ class InmuebleForm(forms.ModelForm):
 class SolicitudArriendoForm(forms.ModelForm):
     class Meta:
         model = SolicitudArriendo
-        fields = [
-            "inmueble",
-            "arrendatario",
-            "mensaje",
-            "estado"
-            
-        ]
+        fields = ["mensaje"]
 
 class PerfilUserForm(forms.ModelForm):
     class Meta:
