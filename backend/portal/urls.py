@@ -7,7 +7,7 @@ from .views import *
 
 urlpatterns = [
 
-  path("", home , name="home"),
+  path("", InmueblesListView.as_view() , name="home"),
    
 
   

@@ -139,7 +139,7 @@ class ComunaDeleteView(DeleteView):
 
 class InmueblesListView(ListView):
     model = Inmueble
-    template_name = "inmuebles/inmueble_list.html"
+    template_name = "web/home.html"
     context_object_name = "inmuebles"
 
 
