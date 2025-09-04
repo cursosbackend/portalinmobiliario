@@ -82,12 +82,48 @@
             {% endfor %}
           </tbody>
         </table>
-      </div>
+
+
+      
+        
     {% else %}
       <div class="alert alert-info mt-3">Aún no recibes solicitudes.</div>
     {% endif %}
   {% endif %}
+   
 
-  {# Si quieres mostrar ambas secciones para ambos roles, quita las condiciones y deja las dos #}
+   </table>   
+  
+
+
 </div>
 {% endblock %}
+    {% if user.tipo_usuario == "ARRENDADOR" %}
+      <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>Id Inmueble</th>
+                    <th>nombre</th>
+                    <th>Mensaje</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for i in inmuebles %}
+                    <tr>
+                      <td>{{i.nombre}}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+    {% endif %}
+
+
+<!-- <span class="badge bg-{% if s.estado == "A" %}success{% elif s.estado == "R" %}danger{% else %}secondary{% endif %}"></span> -->

@@ -1,0 +1,14 @@
+templates boostrap para el register y el login 
+
+manejo de crud del arrendador
+
+proceso para solicitudes (aceptar rechazar etc)
+
+boostrap para el detalle
+
+cuando creamos un inmueble se genere con el user actual
+
+mejorar modelos agregando filefield (para documentos al  crear un inmueble) + permitir borrado de archivos 
+
+cuando una propiedad este arrendada cambiar estado a no disponible y quitar del lista principal (home)
+

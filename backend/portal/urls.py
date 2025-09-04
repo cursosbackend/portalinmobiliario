@@ -34,4 +34,15 @@ urlpatterns = [
   path("accounts/login/",  login_view,  name="login"),
   path("accounts/logout/", logout_view, name="logout"),
   path("accounts/register/", register_view, name="register"),
+
+
+
+##############################################################################################
+#crud solo para el arrendador
+
+path("perfil/inmuebles", PerfilInmueblesListView.as_view(), name="perfil_inmueble_list"),
+
+
+
+
 ]

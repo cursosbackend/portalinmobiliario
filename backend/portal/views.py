@@ -213,6 +213,7 @@ class PerfilView(TemplateView):
         ctx.update({
             "enviadas": enviadas,
             "recibidas": recibidas,
+
         })
         return ctx
 
@@ -229,7 +230,7 @@ def register_view(request):
             user = form.save()
             login(request, user)
             messages.success(request, "Cuenta creada correctamente.")
-            return redirect("home")
+            return redirect("inmueble_list")
     else:
         form = RegisterForm()
     return render(request, "registration/register.html", {"form": form})
@@ -242,7 +243,7 @@ def login_view(request):
         user = form.get_user()
         login(request, user)
         messages.success(request, "Has iniciado sesión.")
-        return redirect("home")
+        return redirect("perfil")
     return render(request, "registration/login.html", {"form": form})
 
 @login_required
@@ -250,3 +251,16 @@ def logout_view(request):
     logout(request)
     messages.info(request, "Has cerrado sesión.")
     return redirect("login")
+
+
+@method_decorator(login_required, name="dispatch")
+class PerfilInmueblesListView(ListView):
+    model = Inmueble
+    template_name = "usuarios/perfil.html"
+    context_object_name = "inmuebles"
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Inmueble.objects.filter(propietario=self.request.user)
+
+    
