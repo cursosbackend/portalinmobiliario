@@ -1,129 +1,109 @@
-{# templates/usuarios/perfil.html #}
-{% load i18n %}
-
+{% extends "web/base.html" %}
+{% block title %}Mi perfil | Alquiler{% endblock %}
 {% block content %}
-<div class="container py-4">
+<section class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h2 class="mb-0">{{ user.get_full_name|default:user.username }}</h2>
-      <small class="text-muted">
-        {{ user.get_username }} · {{ user.tipo_usuario }}
-      </small>
+      <h3 class="mb-0">{{ user.get_full_name|default:user.username }}</h3>
+      <small class="text-muted">{{ user.tipo_usuario }}</small>
     </div>
-    <div>
-      <a href="{% url 'logout' %}" class="btn btn-outline-danger">Cerrar sesión</a>
-    </div>
+    {% if user.tipo_usuario == "ARRENDADOR" %}
+      <a href="{% url 'perfil_inmueble_list' %}" class="btn btn-primary btn-soft">
+        <i class="bi bi-buildings me-1"></i> Gestionar mis inmuebles
+      </a>
+    {% endif %}
   </div>
 
-  {# Mostrar SOLO lo que corresponde al rol #}
   {% if user.tipo_usuario == "ARRENDATARIO" %}
-    <h4 class="mt-4">Mis solicitudes enviadas</h4>
-    {% if enviadas %}
-      <div class="row g-3">
-        {% for s in enviadas %}
-          <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title mb-1">{{ s.inmueble.nombre }}</h5>
-                <small class="text-muted">
-                  {{ s.inmueble.comuna.nombre }} · {{ s.inmueble.get_tipo_de_inmueble_display }}
-                </small>
-                <p class="mt-2 mb-2">{{ s.mensaje|default:"(sin mensaje)" }}</p>
-                <span class="badge bg-{% if s.estado == "A" %}success{% elif s.estado == "R" %}danger{% else %}secondary{% endif %}">
-                  {{ s.get_estado_display }}
-                </span>
+    <div class="card shadow-soft mb-4">
+      <div class="card-body">
+        <h5 class="mb-3">Mis solicitudes enviadas</h5>
+        {% if enviadas %}
+          <div class="list-group">
+            {% for s in enviadas %}
+              <div class="list-group-item list-group-item-action py-3">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">{{ s.inmueble.nombre }}</h6>
+                  <span class="badge 
+                    {% if s.estado == 'A' %} bg-success
+                    {% elif s.estado == 'R' %} bg-danger
+                    {% else %} bg-secondary
+                    {% endif %}">
+                    {{ s.get_estado_display }}
+                  </span>
+                </div>
+                <small class="text-muted">{{ s.inmueble.comuna.nombre }} · {{ s.creado|date:"d/m/Y H:i" }}</small>
+                <p class="mb-0 mt-1">{{ s.mensaje|default:"(sin mensaje)" }}</p>
               </div>
-              <div class="card-footer bg-white">
-                <small class="text-muted">Enviada: {{ s.creado|date:"d/m/Y H:i" }}</small>
-              </div>
-            </div>
+            {% endfor %}
           </div>
-        {% endfor %}
+        {% else %}
+          <div class="alert alert-info mb-0">Aún no envías solicitudes.</div>
+        {% endif %}
       </div>
-    {% else %}
-      <div class="alert alert-info mt-3">Aún no envías solicitudes.</div>
-    {% endif %}
+    </div>
   {% endif %}
 
   {% if user.tipo_usuario == "ARRENDADOR" %}
-    <h4 class="mt-4">Solicitudes recibidas (mis inmuebles)</h4>
-    {% if recibidas %}
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>Inmueble</th>
-              <th>Arrendatario</th>
-              <th>Mensaje</th>
-              <th>Estado</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for s in recibidas %}
-              <tr>
-                <td>
-                  <strong>{{ s.inmueble.nombre }}</strong><br>
-                  <small class="text-muted">
-                    {{ s.inmueble.comuna.nombre }} · {{ s.inmueble.get_tipo_de_inmueble_display }}
-                  </small>
-                </td>
-                <td>
-                  {{ s.arrendatario.get_full_name|default:s.arrendatario.username }}
-                </td>
-                <td>{{ s.mensaje|default:"(sin mensaje)" }}</td>
-                <td>
-                  <span class="badge bg-{% if s.estado == "A" %}success{% elif s.estado == "R" %}danger{% else %}secondary{% endif %}">
-                    {{ s.get_estado_display }}
-                  </span>
-                </td>
-                <td><small>{{ s.creado|date:"d/m/Y H:i" }}</small></td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-
-      
-        
-    {% else %}
-      <div class="alert alert-info mt-3">Aún no recibes solicitudes.</div>
-    {% endif %}
-  {% endif %}
-   
-
-   </table>   
-  
-
-
-</div>
-{% endblock %}
-    {% if user.tipo_usuario == "ARRENDADOR" %}
-      <table class="table table-hover align-middle">
-                <thead>
+    <div class="card shadow-soft">
+      <div class="card-body">
+        <h5 class="mb-3">Solicitudes recibidas (mis inmuebles)</h5>
+        {% if recibidas %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Inmueble</th>
+                  <th>Arrendatario</th>
+                  <th>Mensaje</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in recibidas %}
                   <tr>
-                    <th>Id Inmueble</th>
-                    <th>nombre</th>
-                    <th>Mensaje</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
+                    <td>{{ s.inmueble.nombre }}<br><small class="text-muted">{{ s.inmueble.comuna.nombre }}</small></td>
+                    <td>{{ s.arrendatario.get_full_name|default:s.arrendatario.username }}</td>
+                    <td>{{ s.mensaje|default:"-" }}</td>
+                    <td>
+                      <span class="badge 
+                        {% if s.estado == 'A' %} bg-success
+                        {% elif s.estado == 'R' %} bg-danger
+                        {% else %} bg-secondary
+                        {% endif %}">
+                        {{ s.get_estado_display }}
+                      </span>
+                    </td>
+                    <td><small>{{ s.creado|date:"d/m/Y H:i" }}</small></td>
+                    <td class="text-end">
+                      {% if s.estado == 'P' %}
+                        <form method="post" action="{% url 'solicitud_aceptar' s.pk %}" class="d-inline">
+                          {% csrf_token %}
+                          <input type="hidden" name="next" value="{% url 'perfil' %}">
+                          <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
+                        </form>
+                        <form method="post" action="{% url 'solicitud_rechazar' s.pk %}" class="d-inline ms-1">
+                          {% csrf_token %}
+                          <input type="hidden" name="next" value="{% url 'perfil' %}">
+                          <button type="submit" class="btn btn-sm btn-outline-danger">Rechazar</button>
+                        </form>
+                      {% else %}
+                        <span class="text-muted small">Sin acciones</span>
+                      {% endif %}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {% for i in inmuebles %}
-                    <tr>
-                      <td>{{i.nombre}}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+                {% endfor %}
+              </tbody>
 
-            </div>
-    {% endif %}
-
-
-<!-- <span class="badge bg-{% if s.estado == "A" %}success{% elif s.estado == "R" %}danger{% else %}secondary{% endif %}"></span> -->
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-info mb-0">Aún no recibes solicitudes.</div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
